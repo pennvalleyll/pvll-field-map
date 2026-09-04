@@ -311,14 +311,14 @@
                     // First Aid notice explicitly for the Snack Shack popup
                     const firstAidNotice = isSnackShack ? `<div style="background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-bottom: 8px; text-align: center;">✚ First Aid Kit Located Here</div>` : '';
 
-                    // Upcoming Events (Games)
+                    // Upcoming Games
                     let scheduleListHtml = '';
                     if (sheetData && sheetData.scheduleData) {
                         const matchingEvents = sheetData.scheduleData.filter(evt => evt.Join_ID && evt.Join_ID.trim() === joinId);
                         if (matchingEvents.length > 0) {
                             scheduleListHtml = `
                                 <div class="popup-schedule">
-                                    <strong>Upcoming Events:</strong>
+                                    <strong>Upcoming Games:</strong>
                                     <ul>
                                         ${matchingEvents.map(evt => `<li><strong>${evt.Date || ''} ${evt.Time || ''}</strong>: ${evt.Event || ''}</li>`).join('')}
                                     </ul>

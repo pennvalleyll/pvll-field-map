@@ -134,7 +134,7 @@
     const locateControl = L.control({ position: 'topleft' });
     locateControl.onAdd = function () {
         const btn = L.DomUtil.create('button', 'locate-btn');
-        btn.innerHTML = 'ð';
+        btn.innerHTML = '📍';
         btn.title = 'Find My Location';
         btn.onclick = function (e) {
             e.stopPropagation();
@@ -206,7 +206,7 @@
                     const marker = L.marker(latlng, {
                         icon: L.divIcon({
                             className: 'custom-point-icon',
-                            html: '<span style="font-size: 24px; text-shadow: 1px 1px 2px #000;">ð¿ï¸</span>',
+                            html: '<span style="font-size: 24px; text-shadow: 1px 1px 2px #000;">🐿️</span>',
                             iconSize: [30, 30],
                             iconAnchor: [15, 15]
                         })
@@ -260,10 +260,10 @@
                     let labelContent = feature.properties.Field_Name;
                     
                     if (feature.properties.Feature_Class === 'Restroom') {
-                        labelContent = '<span style="font-size: 20px;">ð»</span>';
+                        labelContent = '<span style="font-size: 20px;">🚻</span>';
                     } else if (feature.properties.Feature_Class === 'Snack Shack') {
                         // Adds a red medical cross next to the burger icon
-                        labelContent = '<div style="text-align: center;"><span style="font-size: 20px;">ð <span style="color: #dc2626;">â</span></span><br>' + feature.properties.Field_Name + '</div>';
+                        labelContent = '<div style="text-align: center;"><span style="font-size: 20px;">🍔 <span style="color: #dc2626;">✚</span></span><br>' + feature.properties.Field_Name + '</div>';
                     }
 
                     layer.bindTooltip(labelContent, {
@@ -309,7 +309,7 @@
                     const badgeHtml = isSnackShack ? '' : `<span class="status-badge ${badgeClass}">${status.toUpperCase()}</span>`;
                     
                     // First Aid notice explicitly for the Snack Shack popup
-                    const firstAidNotice = isSnackShack ? `<div style="background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-bottom: 8px; text-align: center;">â First Aid Kit Located Here</div>` : '';
+                    const firstAidNotice = isSnackShack ? `<div style="background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-bottom: 8px; text-align: center;">✚ First Aid Kit Located Here</div>` : '';
 
                     // Upcoming Events (Games)
                     let scheduleListHtml = '';
@@ -349,8 +349,8 @@
                         ${firstAidNotice}
                         ${badgeHtml}
                         ${notes ? `<div class="popup-notes">${notes}</div>` : ''}
-                        ${menuLink ? `<div style="margin-bottom: 6px;"><a href="${menuLink}" target="_blank" style="color: #0284c7; font-weight: bold; text-decoration: none;">ð View Menu</a></div>` : ''}
-                        ${volunteerLink ? `<div style="margin-bottom: 8px;"><a href="${volunteerLink}" target="_blank" style="color: #16a34a; font-weight: bold; text-decoration: none;">ð¤ Volunteer Signup</a></div>` : ''}
+                        ${menuLink ? `<div style="margin-bottom: 6px;"><a href="${menuLink}" target="_blank" style="color: #0284c7; font-weight: bold; text-decoration: none;">📄 View Menu</a></div>` : ''}
+                        ${volunteerLink ? `<div style="margin-bottom: 8px;"><a href="${volunteerLink}" target="_blank" style="color: #16a34a; font-weight: bold; text-decoration: none;">🤝 Volunteer Signup</a></div>` : ''}
                         ${scheduleListHtml}
                         ${practiceHtml}
                     `;
@@ -383,7 +383,7 @@
             div.innerHTML = `
                 <div style="margin-bottom: 10px; text-align: center; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
                     <a href="https://www.google.com/maps/dir/?api=1&destination=39.2041,-121.1896" target="_blank" style="display: block; background: #0284c7; color: white; padding: 6px 10px; border-radius: 4px; text-decoration: none; font-weight: bold; font-size: 13px;">
-                        ð Get Directions
+                        🚗 Get Directions
                     </a>
                 </div>
                 
@@ -393,9 +393,9 @@
                 <div class="legend-item"><span class="legend-color" style="background:#f59e0b;"></span> Maintenance</div>
                 
                 <div style="font-weight: bold; margin: 8px 0 4px 0; font-size: 13px;">Facilities</div>
-                <div class="legend-item"><span class="legend-color" style="background:#9333ea;"></span> ð Snack Shack</div>
-                <div class="legend-item"><span style="color: #dc2626; font-weight: bold; width: 12px; display: inline-block; text-align: center;">â</span> First Aid Kit</div>
-                <div class="legend-item"><span class="legend-color" style="background:#0284c7;"></span> ð» Restroom</div>
+                <div class="legend-item"><span class="legend-color" style="background:#9333ea;"></span> 🍔 Snack Shack</div>
+                <div class="legend-item"><span style="color: #dc2626; font-weight: bold; width: 12px; display: inline-block; text-align: center;">✚</span> First Aid Kit</div>
+                <div class="legend-item"><span class="legend-color" style="background:#0284c7;"></span> 🚻 Restroom</div>
                 <div class="legend-item"><span class="legend-color" style="background:#64748b;"></span> Parking</div>
                 <div class="legend-item"><span class="legend-color" style="background:#fbbf24;"></span> Driveway</div>
             `;

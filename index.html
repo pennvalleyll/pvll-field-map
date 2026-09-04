@@ -93,6 +93,15 @@
             box-shadow: 0 1px 5px rgba(0,0,0,0.65);
         }
         .locate-btn:hover { background-color: #f4f4f4; }
+        
+        /* Logo styling */
+        .map-logo {
+            max-width: 100px; /* Adjust this number to make it bigger/smaller */
+            height: auto;
+            margin: 10px;
+            filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.6));
+            pointer-events: none; /* Lets users click through the logo to the map */
+        }
 
         /* Legend */
         .map-legend {
@@ -402,6 +411,17 @@
             return div;
         };
         legend.addTo(map);
+        
+        // Logo Control
+        const logoControl = L.control({ position: 'bottomleft' });
+        logoControl.onAdd = function () {
+            const img = L.DomUtil.create('img', 'map-logo');
+            // UPDATE THIS LINE with the exact name of the file you uploaded to GitHub
+            img.src = 'pvll-logo.png'; 
+            img.alt = 'PVLL Logo';
+            return img;
+        };
+        logoControl.addTo(map);
 
     }).catch(err => {
         console.error('Failed loading map assets:', err);

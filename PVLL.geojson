@@ -1254,8 +1254,36 @@
       "geometry": {
         "type": "Point",
         "coordinates": [
-          -121.1891059,
-          39.2038552
+          -121.1892845,
+          39.2038275
+        ]
+      }
+    }
+    {
+      "type": "Feature",
+      "properties": {
+        "Field_Name": "Local Gopher",
+        "Feature_Class": "Gopher"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.1888628,
+          39.2035793
+        ]
+      }
+    }
+    {
+      "type": "Feature",
+      "properties": {
+        "Field_Name": "Local Gopher",
+        "Feature_Class": "Gopher"
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -121.1881703,
+          39.2033716
         ]
       }
     }

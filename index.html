@@ -320,21 +320,42 @@
                     // First Aid notice explicitly for the Snack Shack popup
                     const firstAidNotice = isSnackShack ? `<div style="background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-bottom: 8px; text-align: center;">✚ First Aid Kit Located Here</div>` : '';
 
-                    // Upcoming Games
+                    // Upcoming Events (Games)
                     let scheduleListHtml = '';
                     if (sheetData && sheetData.scheduleData) {
                         const matchingEvents = sheetData.scheduleData.filter(evt => evt.Join_ID && evt.Join_ID.trim() === joinId);
                         if (matchingEvents.length > 0) {
+                            
+                            // Group the events by Date
+                            const eventsByDate = {};
+                            matchingEvents.forEach(evt => {
+                                const gameDate = evt.Date || 'TBD';
+                                if (!eventsByDate[gameDate]) {
+                                    eventsByDate[gameDate] = [];
+                                }
+                                eventsByDate[gameDate].push(evt);
+                            });
+
+                            // Build the grouped HTML
+                            let gamesHtml = '';
+                            for (const [date, games] of Object.entries(eventsByDate)) {
+                                gamesHtml += `
+                                    <div style="font-weight: bold; font-size: 13px; margin-top: 8px; color: #0f172a;">${date}</div>
+                                    <ul style="margin: 2px 0 4px 0; padding-left: 18px;">
+                                        ${games.map(game => `<li><strong>${game.Time || ''}</strong>: ${game.Event || ''}</li>`).join('')}
+                                    </ul>
+                                `;
+                            }
+
                             scheduleListHtml = `
                                 <div class="popup-schedule">
-                                    <strong>Upcoming Games:</strong>
-                                    <ul>
-                                        ${matchingEvents.map(evt => `<li><strong>${evt.Date || ''} ${evt.Time || ''}</strong>: ${evt.Event || ''}</li>`).join('')}
-                                    </ul>
+                                    <strong style="font-size: 14px;">Upcoming Events:</strong>
+                                    ${gamesHtml}
                                 </div>
                             `;
                         }
                     }
+
 
                     // Practice Schedule
                     let practiceHtml = '';

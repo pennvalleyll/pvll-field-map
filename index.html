@@ -96,11 +96,11 @@
         
         /* Logo styling */
         .map-logo {
-            max-width: 150px; /* Adjust this number to make it bigger/smaller */
+            max-width: 150px;
             height: auto;
             margin: 10px;
             filter: drop-shadow(0px 2px 4px rgba(0,0,0,0.6));
-            pointer-events: none; /* Lets users click through the logo to the map */
+            pointer-events: none;
         }
 
         /* Legend */
@@ -134,7 +134,7 @@
 <script src="https://cdn.jsdelivr.net/npm/leaflet-textpath@1.2.3/leaflet.textpath.min.js"></script>
 
 <script>
-    // 1. Initialize Leaflet (Allows zooming deeper than native Esri tiles)
+    // 1. Initialize Leaflet
     const map = L.map('map', {
         maxZoom: 20
     }).setView([39.2035, -121.1880], 17);
@@ -153,13 +153,11 @@
     };
     locateControl.addTo(map);
 
-    // Handle location found/error events
     let userMarker;
     map.on('locationfound', function (e) {
         if (userMarker) {
             userMarker.setLatLng(e.latlng);
         } else {
-            // Drops a pulsing blue dot on the user's location
             userMarker = L.circleMarker(e.latlng, {
                 radius: 8, fillColor: "#3b82f6", color: "#ffffff", 
                 weight: 2, opacity: 1, fillOpacity: 1
@@ -170,7 +168,7 @@
         alert("Could not access your location. Please check your device settings.");
     });
 
-    // 3. Basemap layers (Caps network requests at 19, stretches up to 22)
+    // 3. Basemap layers
     L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', {
         maxZoom: 20,
         maxNativeZoom: 19,
@@ -197,7 +195,6 @@
         fetch(appsScriptUrl).then(res => res.json())
     ]).then(([geoData, sheetData]) => {
 
-        // Build a lookup map for Google Sheet data
         const statusMap = new Map();
         if (sheetData && sheetData.statusData) {
             sheetData.statusData.forEach(row => {
@@ -205,11 +202,9 @@
             });
         }
 
-        // Array to store specific point features for zoom-based rendering
         let pointLayers = [];
 
         L.geoJSON(geoData, {
-            // Handle point geometries (like the Easter Egg Gopher)
             pointToLayer: function (feature, latlng) {
                 if (feature.properties.Feature_Class === 'Gopher') {
                     const marker = L.marker(latlng, {
@@ -229,7 +224,6 @@
                 const fClass = feature.properties.Feature_Class;
                 const joinId = feature.properties.Join_ID ? feature.properties.Join_ID.trim() : null;
 
-                // Static elements
                 if (fClass === 'Driveway') {
                     return { color: '#fbbf24', weight: 10, opacity: 0.9 };
                 }
@@ -246,7 +240,6 @@
                     return { color: '#a855f7', fillColor: '#9333ea', weight: 2, fillOpacity: 0.6 };
                 }
 
-                // Dynamic elements (Fields) colored by sheet status
                 if (joinId && statusMap.has(joinId)) {
                     const status = (statusMap.get(joinId).Status || '').trim().toLowerCase();
                     if (status === 'open') {
@@ -264,14 +257,12 @@
             },
 
             onEachFeature: function (feature, layer) {
-                // Permanent text labels centered on polygons (excludes point features)
                 if (feature.properties.Field_Name && feature.geometry.type !== 'LineString' && feature.properties.Feature_Class !== 'Gopher') {
                     let labelContent = feature.properties.Field_Name;
                     
                     if (feature.properties.Feature_Class === 'Restroom') {
                         labelContent = '<span style="font-size: 20px;">🚻</span>';
                     } else if (feature.properties.Feature_Class === 'Snack Shack') {
-                        // Adds a red medical cross next to the burger icon
                         labelContent = '<div style="text-align: center;"><span style="font-size: 20px;">🍔 <span style="color: #dc2626;">✚</span></span><br>' + feature.properties.Field_Name + '</div>';
                     }
 
@@ -282,7 +273,6 @@
                     });
                 }
                 
-                // Curved text logic for the Creek
                 if (feature.properties.Feature_Class === 'Creek') {
                     layer.on('add', function () {
                         layer.setText(feature.properties.Field_Name, {
@@ -298,7 +288,6 @@
                     });
                 }
 
-                // Interactive popups for tracked items
                 const joinId = feature.properties.Join_ID ? feature.properties.Join_ID.trim() : null;
                 if (joinId) {
                     const statusRecord = statusMap.get(joinId) || {};
@@ -307,7 +296,6 @@
                     const menuLink = (statusRecord.Menu_Link || '').trim();
                     const volunteerLink = (statusRecord.Volunteer_Link || '').trim();
 
-                    // Hide Status Badge on Snack Shack
                     const isSnackShack = feature.properties.Feature_Class === 'Snack Shack';
                     let badgeClass = 'status-unknown';
                     const lowerStatus = status.toLowerCase();
@@ -317,7 +305,6 @@
                     
                     const badgeHtml = isSnackShack ? '' : `<span class="status-badge ${badgeClass}">${status.toUpperCase()}</span>`;
                     
-                    // First Aid notice explicitly for the Snack Shack popup
                     const firstAidNotice = isSnackShack ? `<div style="background: #fee2e2; color: #dc2626; padding: 4px 8px; border-radius: 4px; font-weight: bold; font-size: 12px; margin-bottom: 8px; text-align: center;">✚ First Aid Kit Located Here</div>` : '';
 
                     // Upcoming Events (Games)
@@ -326,36 +313,52 @@
                         const matchingEvents = sheetData.scheduleData.filter(evt => evt.Join_ID && evt.Join_ID.trim() === joinId);
                         if (matchingEvents.length > 0) {
                             
-                            // Group the events by Date
+                            // Setup 3-week window filter dates
+                            const today = new Date();
+                            today.setHours(0, 0, 0, 0); // Start of today
+                            const threeWeeksOut = new Date(today);
+                            threeWeeksOut.setDate(today.getDate() + 21);
+                            threeWeeksOut.setHours(23, 59, 59, 999); // End of 21st day
+                            
                             const eventsByDate = {};
+                            let hasUpcomingEvents = false;
+
                             matchingEvents.forEach(evt => {
-                                const gameDate = evt.Date || 'TBD';
-                                if (!eventsByDate[gameDate]) {
-                                    eventsByDate[gameDate] = [];
+                                if (evt.Date) {
+                                    const gameDate = new Date(evt.Date);
+                                    
+                                    // Check if date is valid and falls within the next 3 weeks
+                                    if (!isNaN(gameDate) && gameDate >= today && gameDate <= threeWeeksOut) {
+                                        const gameDateStr = evt.Date;
+                                        if (!eventsByDate[gameDateStr]) {
+                                            eventsByDate[gameDateStr] = [];
+                                        }
+                                        eventsByDate[gameDateStr].push(evt);
+                                        hasUpcomingEvents = true;
+                                    }
                                 }
-                                eventsByDate[gameDate].push(evt);
                             });
 
-                            // Build the grouped HTML
-                            let gamesHtml = '';
-                            for (const [date, games] of Object.entries(eventsByDate)) {
-                                gamesHtml += `
-                                    <div style="font-weight: bold; font-size: 13px; margin-top: 8px; color: #0f172a;">${date}</div>
-                                    <ul style="margin: 2px 0 4px 0; padding-left: 18px;">
-                                        ${games.map(game => `<li><strong>${game.Time || ''}</strong>: ${game.Event || ''}</li>`).join('')}
-                                    </ul>
+                            if (hasUpcomingEvents) {
+                                let gamesHtml = '';
+                                for (const [date, games] of Object.entries(eventsByDate)) {
+                                    gamesHtml += `
+                                        <div style="font-weight: bold; font-size: 13px; margin-top: 8px; color: #0f172a;">${date}</div>
+                                        <ul style="margin: 2px 0 4px 0; padding-left: 18px;">
+                                            ${games.map(game => `<li><strong>${game.Time || ''}</strong>: ${game.Event || ''}</li>`).join('')}
+                                        </ul>
+                                    `;
+                                }
+
+                                scheduleListHtml = `
+                                    <div class="popup-schedule">
+                                        <strong>Upcoming Events:</strong>
+                                        ${gamesHtml}
+                                    </div>
                                 `;
                             }
-
-                            scheduleListHtml = `
-                                <div class="popup-schedule">
-                                    <strong>Upcoming Events:</strong>
-                                    ${gamesHtml}
-                                </div>
-                            `;
                         }
                     }
-
 
                     // Practice Schedule
                     let practiceHtml = '';
@@ -373,7 +376,6 @@
                         }
                     }
 
-                    // Build Final Popup Content
                     const popupContent = `
                         <div class="popup-title">${feature.properties.Field_Name}</div>
                         ${firstAidNotice}
@@ -389,11 +391,9 @@
             }
         }).addTo(map);
 
-        // Update point layer visibility based on map zoom level
         function updatePointVisibility() {
             const currentZoom = map.getZoom();
             pointLayers.forEach(marker => {
-                // Changed to 20 so the gopher only appears when fully zoomed in
                 if (currentZoom >= 20) {
                     if (!map.hasLayer(marker)) map.addLayer(marker);
                 } else {
@@ -402,11 +402,9 @@
             });
         }
 
-        // Attach event listener and run initial check for zoom depth
         map.on('zoomend', updatePointVisibility);
         updatePointVisibility();
 
-        // Legend Control with Google Maps Directions and First Aid integration
         const legend = L.control({ position: 'bottomright' });
         legend.onAdd = function () {
             const div = L.DomUtil.create('div', 'map-legend');
@@ -433,11 +431,9 @@
         };
         legend.addTo(map);
         
-        // Logo Control
         const logoControl = L.control({ position: 'bottomleft' });
         logoControl.onAdd = function () {
             const img = L.DomUtil.create('img', 'map-logo');
-            // UPDATE THIS LINE with the exact name of the file you uploaded to GitHub
             img.src = 'pvll-logo.PNG'; 
             img.alt = 'PVLL Logo';
             return img;
